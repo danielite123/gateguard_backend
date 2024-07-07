@@ -77,13 +77,13 @@ export const loginUser = async (req, res) => {
       .status(200)
       .cookie("token", token, {
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-        secure: process.env.NODE_ENV === "development" ? true : false,
-        httpOnly: process.env.NODE_ENV === "development" ? true : false,
-        sameSite: process.env.NODE_ENV === "development" ? true : false,
+        secure: process.env.NODE_ENV === "production", // Set to true only in production
+        httpOnly: true, // This should generally be true for security
+        sameSite: "lax", // This is a good default for most cases
       })
       .send({
         success: true,
-        message: "Login Sucess",
+        message: "Login Success",
         token,
         user,
       });
@@ -304,6 +304,25 @@ export const getUserById = async (req, res) => {
     res.status(500).send({
       success: false,
       message: "Error in get user by id api",
+      error,
+    });
+  }
+};
+
+//total number of users
+export const totalUsers = async (req, res) => {
+  try {
+    const totalUsers = await userModel.countDocuments({});
+    res.status(200).send({
+      success: true,
+      message: "Total number of users fetched successfully",
+      totalUsers,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in total users api",
       error,
     });
   }

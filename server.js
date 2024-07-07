@@ -36,8 +36,8 @@ app.use(cors());
 app.use(cookieParser());
 
 //route
-app.use("/api/user", userRoutes);
-app.use("/api/driver", driverRoutes);
+app.use("/user", userRoutes);
+app.use("/driver", driverRoutes);
 
 app.get("/", (req, res) => {
   return res.status(200).send("Hello, world!");

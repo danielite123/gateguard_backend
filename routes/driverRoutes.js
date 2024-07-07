@@ -8,8 +8,10 @@ import {
   updatePassword,
   updateProfilePicture,
   updateDriverLicense,
+  getAllDrivers,
+  totalDrivers,
 } from "../controllers/driverControllers.js";
-import { isAuth } from "../middleware/authMiddleware.js";
+import { isAdmin, isAuth } from "../middleware/authMiddleware.js";
 import { singleUpload } from "../middleware/multer.js";
 
 //router object
@@ -39,5 +41,11 @@ router.put("/update-picture", isAuth, singleUpload, updateProfilePicture);
 
 // update driver license
 router.put("/update-license", isAuth, singleUpload, updateDriverLicense);
+
+// get all users
+router.get("/get-all-drivers", isAuth, isAdmin, getAllDrivers);
+
+// get total driver
+router.get("/total", totalDrivers);
 
 export default router;

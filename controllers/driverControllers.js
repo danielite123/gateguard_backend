@@ -283,3 +283,41 @@ export const updateDriverLicense = async (req, res) => {
     });
   }
 };
+
+// get all drivers
+export const getAllDrivers = async (req, res) => {
+  try {
+    const users = await driverModel.find({});
+    res.status(200).send({
+      success: true,
+      message: "All drivers fetched successfully",
+      users,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in get all users api",
+      error,
+    });
+  }
+};
+
+//total number of users
+export const totalDrivers = async (req, res) => {
+  try {
+    const totalDrivers = await driverModel.countDocuments({});
+    res.status(200).send({
+      success: true,
+      message: "Total number of users fetched successfully",
+      totalDrivers,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in total users api",
+      error,
+    });
+  }
+};

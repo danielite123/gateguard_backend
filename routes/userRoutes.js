@@ -10,6 +10,7 @@ import {
   updateProfilePicture,
   getAllUsers,
   getUserById,
+  totalUsers,
 } from "../controllers/userControllers.js";
 import { isAuth, isAdmin } from "../middleware/authMiddleware.js";
 import { singleUpload } from "../middleware/multer.js";
@@ -43,9 +44,12 @@ router.put("/update-password", isAuth, updatePassword);
 router.put("/update-picture", isAuth, singleUpload, updateProfilePicture);
 
 // get all users
-router.get("/get-all-users", getAllUsers);
+router.get("/get-all-users", isAuth, getAllUsers);
 
 // get a user
 router.get("/get-user/:id", isAuth, getUserById);
+
+// get total user
+router.get("/total", totalUsers);
 
 export default router;

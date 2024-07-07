@@ -2,29 +2,32 @@ import jwt from "jsonwebtoken";
 import userModel from "../models/userModels.js";
 import driverModel from "../models/driverModel.js";
 
-//User Auth
+// User Auth
 export const isAuth = async (req, res, next) => {
-  const { token } = req.cookies;
-  //validation
+  const token = req.headers.authorization?.split(" ")[1]; // Extract token from header
+
   if (!token) {
-    return res.status(401).send({
-      success: false,
-      message: "Unauthorized User",
-    });
+    return res
+      .status(401)
+      .send({ success: false, message: "Unauthorized User" });
   }
-  const decodeData = jwt.verify(token, process.env.JWT_SECRET);
-  req.user = await userModel.findById(decodeData._id);
-  req.driver = await driverModel.findById(decodeData._id);
-  next();
+
+  try {
+    const decodeData = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await userModel.findById(decodeData._id);
+    req.driver = await driverModel.findById(decodeData._id);
+    next();
+  } catch (error) {
+    return res.status(401).send({ success: false, message: "Invalid Token" });
+  }
 };
 
-//Admin Auth
-export const isAdmin = async (req, res, next) => {
+// Admin Auth
+export const isAdmin = (req, res, next) => {
   if (req.user.role !== "admin") {
-    return res.status(401).send({
-      success: false,
-      message: "Unauthorized Admin",
-    });
+    return res
+      .status(401)
+      .send({ success: false, message: "Unauthorized Admin" });
   }
   next();
 };
