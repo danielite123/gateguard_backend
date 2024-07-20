@@ -46,6 +46,6 @@ router.put("/update-license", isAuth, singleUpload, updateDriverLicense);
 router.get("/get-all-drivers", isAuth, isAdmin, getAllDrivers);
 
 // get total driver
-router.get("/total", totalDrivers);
+router.get("/total", isAuth, isAdmin, totalDrivers);
 
 export default router;

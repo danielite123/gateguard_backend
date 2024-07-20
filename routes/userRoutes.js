@@ -50,6 +50,6 @@ router.get("/get-all-users", isAuth, getAllUsers);
 router.get("/get-user/:id", isAuth, getUserById);
 
 // get total user
-router.get("/total", totalUsers);
+router.get("/total", isAuth, isAdmin, totalUsers);
 
 export default router;

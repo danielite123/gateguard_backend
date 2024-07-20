@@ -7,6 +7,7 @@ import cloudinary from "cloudinary";
 //routes imports
 import userRoutes from "./routes/userRoutes.js";
 import driverRoutes from "./routes/driverRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 import connectDB from "./config/db.js";
 
 //dot env configuration
@@ -38,6 +39,7 @@ app.use(cookieParser());
 //route
 app.use("/user", userRoutes);
 app.use("/driver", driverRoutes);
+app.use("/order", orderRoutes);
 
 app.get("/", (req, res) => {
   return res.status(200).send("Hello, world!");

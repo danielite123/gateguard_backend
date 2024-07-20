@@ -5,40 +5,45 @@ import { getDataUri } from "../utils/features.js";
 //Register user
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
-    //validation`
-    if (!name || !email || !password || !phone) {
-      return res.status(500)({
+    const { fullname, email, password, phone } = req.body;
+
+    // Validation
+    if (!fullname || !email || !password || !phone) {
+      return res.status(400).send({
         success: false,
         message: "Provide all Fields",
       });
     }
-    // check existing user
+
+    // Check existing user
     const existingUser = await userModel.findOne({ email });
-    //validation
     if (existingUser) {
-      return res.status(500).send({
+      return res.status(400).send({
         success: false,
         message: "Email already exists",
       });
     }
-    // create new user
+
+    // Create new user
     const user = await userModel.create({
-      name,
+      fullname,
       email,
       password,
       phone,
     });
+
     res.status(201).send({
       success: true,
-      message: "Registration Sucess please login",
+      message: "Registration Successful, please login",
       user,
     });
   } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .send({ success: false, message: " Error in register api", error });
+    console.error(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in register API",
+      error,
+    });
   }
 };
 

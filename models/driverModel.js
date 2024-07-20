@@ -1,6 +1,45 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+const { Schema } = mongoose;
+
+const orderSchema = new mongoose.Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User", // This should match the model name of your user schema
+    required: true,
+  },
+  driver: {
+    type: Schema.Types.ObjectId,
+    ref: "Driver",
+    default: null,
+  },
+  from: {
+    type: String,
+    required: true,
+  },
+  to: {
+    type: String,
+    required: true,
+  },
+  distance: {
+    type: String,
+    required: true,
+  },
+  duration: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["pending", "accepted", "completed", "cancelled"], // Example status values
+    default: "pending",
+  },
+});
 
 const driverSchema = new mongoose.Schema(
   {
@@ -47,6 +86,7 @@ const driverSchema = new mongoose.Schema(
         type: String,
       },
     },
+    orders: [orderSchema],
   },
   { timestamps: true }
 );

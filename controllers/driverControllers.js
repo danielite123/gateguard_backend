@@ -2,13 +2,13 @@ import driverModel from "../models/driverModel.js";
 import cloudinary from "cloudinary";
 import { getDataUri } from "../utils/features.js";
 
-//Register diver
 export const registerDriver = async (req, res) => {
   try {
     const { name, email, password, phone, age } = req.body;
-    //validation`
+
+    // Validate fields
     if (!name || !email || !password || !phone || !age) {
-      return res.status(500)({
+      return res.status(500).json({
         success: false,
         message: "Provide all Fields",
       });
@@ -22,16 +22,16 @@ export const registerDriver = async (req, res) => {
       });
     }
 
-    // check existing driver
+    // Check existing driver
     const existingDriver = await driverModel.findOne({ email });
-    //validation
     if (existingDriver) {
-      return res.status(500).send({
+      return res.status(500).json({
         success: false,
         message: "Email already exists",
       });
     }
-    // create new driver
+
+    // Create new driver
     const driver = await driverModel.create({
       name,
       email,
@@ -39,16 +39,19 @@ export const registerDriver = async (req, res) => {
       phone,
       age,
     });
-    res.status(201).send({
+
+    res.status(201).json({
       success: true,
-      message: "Registration Sucess please login",
+      message: "Registration Success, please login",
       driver,
     });
   } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .send({ success: false, message: " Error in register api", error });
+    console.error("Error in register api:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error in register api",
+      error: error.message,
+    });
   }
 };
 
@@ -109,6 +112,12 @@ export const loginDriver = async (req, res) => {
 export const getDriverProfile = async (req, res) => {
   try {
     const driver = await driverModel.findById(req.driver._id);
+    if (!driver) {
+      return res.status(404).send({
+        success: false,
+        message: "Driver not found",
+      });
+    }
     driver.password = undefined;
     res.status(200).send({
       success: true,
@@ -116,11 +125,11 @@ export const getDriverProfile = async (req, res) => {
       driver,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error in getDriverProfile:", error);
     res.status(500).send({
       success: false,
-      message: "Error in profile api",
-      error,
+      message: "Error fetching driver profile",
+      error: error.message,
     });
   }
 };
