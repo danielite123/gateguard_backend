@@ -238,24 +238,37 @@ export const updatePassword = async (req, res) => {
 //update profile picture
 export const updateProfilePicture = async (req, res) => {
   try {
+    if (!req.file) {
+      return res
+        .status(400)
+        .send({ success: false, message: "No file provided" });
+    }
+
     const user = await userModel.findById(req.user._id);
-    // file get from client photo
+    if (!user) {
+      return res
+        .status(404)
+        .send({ success: false, message: "User not found" });
+    }
+
     const file = getDataUri(req.file);
 
-    // Check if user already has a profile picture
     if (user.profilePic && user.profilePic.public_id) {
-      // Delete previous profile picture from Cloudinary
       await cloudinary.uploader.destroy(user.profilePic.public_id);
     }
 
-    // upload new photo
     const cbd = await cloudinary.v2.uploader.upload(file.content);
+    if (!cbd || !cbd.public_id || !cbd.secure_url) {
+      return res.status(500).send({ success: false, message: "Upload failed" });
+    }
+
     user.profilePic = {
       public_id: cbd.public_id,
       url: cbd.secure_url,
     };
-    //save function
+
     await user.save();
+
     res.status(200).send({
       success: true,
       message: "Profile picture updated successfully",

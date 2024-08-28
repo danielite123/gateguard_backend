@@ -8,6 +8,7 @@ import cloudinary from "cloudinary";
 import userRoutes from "./routes/userRoutes.js";
 import driverRoutes from "./routes/driverRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import routesRoutes from "./routes/routesRoutes.js";
 import connectDB from "./config/db.js";
 
 //dot env configuration
@@ -23,10 +24,6 @@ cloudinary.v2.config({
   api_key: process.env.ClOUDINARY_API_KEY,
 });
 
-// console.log(process.env.CLOUDINARY_NAME);
-// console.log(process.env.CLOUDINARY_API_SECRET);
-// console.log(process.env.ClOUDINARY_API_KEY);
-
 //rest object
 const app = express();
 
@@ -40,6 +37,7 @@ app.use(cookieParser());
 app.use("/user", userRoutes);
 app.use("/driver", driverRoutes);
 app.use("/order", orderRoutes);
+app.use("/routes", routesRoutes);
 
 app.get("/", (req, res) => {
   return res.status(200).send("Hello, world!");

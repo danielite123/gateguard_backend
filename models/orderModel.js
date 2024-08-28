@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const orderSchema = new mongoose.Schema({
   user: {
     type: Schema.Types.ObjectId,
-    ref: "User", // This should match the model name of your user schema
+    ref: "User",
     required: true,
   },
   driver: {
