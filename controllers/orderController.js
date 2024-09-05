@@ -40,8 +40,8 @@ export const createOrder = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `http://localhost:3030/success?session_id={CHECKOUT_SESSION_ID}`, // Redirect URL on success
-      cancel_url: "http://localhost:3030/cancel", // Redirect URL on cancellation
+      success_url: `https://gategaurd-client.vercel.app/success?session_id={CHECKOUT_SESSION_ID}`, // Redirect URL on success
+      cancel_url: "https://gategaurd-client.vercel.app/cancel", // Redirect URL on cancellation
       metadata: {
         orderId: savedOrder._id.toString(), // Pass the order ID to the metadata
       },
