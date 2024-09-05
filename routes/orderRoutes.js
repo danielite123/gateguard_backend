@@ -10,7 +10,7 @@ import {
   getPendingOrders,
   getDriverCompletedOrders,
   totalOrders,
-  orderPayment,
+  updatePaymentStatus,
 } from "../controllers/orderController.js";
 import { isAdmin, isAuth } from "../middleware/authMiddleware.js";
 //router object
@@ -36,6 +36,8 @@ router.get(
   getDriverCompletedOrders
 );
 
+router.post("/update-payment/:orderId", updatePaymentStatus);
+
 // get order by id
 router.get("/get-order/:orderId", isAuth, getOrderById);
 
@@ -50,7 +52,5 @@ router.put("/complete-order/:orderId", isAuth, completeOrder);
 
 // get total orderr
 router.get("/total", isAuth, isAdmin, totalOrders);
-
-router.post("/payment", orderPayment);
 
 export default router;

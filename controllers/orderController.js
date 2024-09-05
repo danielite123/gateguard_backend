@@ -1,23 +1,13 @@
 import orderModel from "../models/orderModel.js";
 import Stripe from "stripe";
-import dotenv from "dotenv";
 
-dotenv.config(); // Load environment variables
-
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
-// Function to calculate price based on distance (example)
-const calculatePrice = (distance) => {
-  // Your price calculation logic here
-  const price = parseFloat(distance) * 10; // Example calculation: $10 per unit distance
-  return Math.round(price); // Round the price to the nearest whole number
-};
+const stripe = Stripe(
+  "sk_test_51PeJ6YECc33s4wLhgKNXzlWVolrM7ReVUGlLD7B1LTnqcMJCYL4vmkHBtOcESxfqqbMDtrLZXRjjOvaQdGGsIB0o00KTpZUdHB"
+);
 
 export const createOrder = async (req, res) => {
-  const { from, to, distance, duration } = req.body;
+  const { from, to, distance, duration, price } = req.body;
   const userId = req.user._id; // Assuming `isAuth` middleware sets `req.user`
-
-  const price = calculatePrice(distance);
 
   const newOrder = new orderModel({
     user: userId, // Link the order to the authenticated user
@@ -31,8 +21,34 @@ export const createOrder = async (req, res) => {
   });
 
   try {
+    // Save the order to the database
     const savedOrder = await newOrder.save();
-    res.status(201).json(savedOrder);
+
+    // Create a Stripe Checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "Trip from " + from + " to " + to,
+            },
+            unit_amount: price * 100, // Convert dollars to cents
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `http://localhost:3030/success?session_id={CHECKOUT_SESSION_ID}`, // Redirect URL on success
+      cancel_url: "http://localhost:3030/cancel", // Redirect URL on cancellation
+      metadata: {
+        orderId: savedOrder._id.toString(), // Pass the order ID to the metadata
+      },
+    });
+
+    // Return the session ID
+    res.status(201).json({ sessionId: session.id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error in createOrder API", error });
@@ -204,22 +220,25 @@ export const totalOrders = async (req, res) => {
   }
 };
 
-export const orderPayment = async (req, res) => {
-  const { amount, payment_method_id } = req.body;
+// Update payment status to "paid" after successful payment
+export const updatePaymentStatus = async (req, res) => {
+  const { orderId } = req.params;
+  const { paymentStatus } = req.body; // Should be 'paid'
 
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "usd",
-      payment_method: payment_method_id,
-      confirmation_method: "manual",
-      confirm: true,
-      return_url: "http://localhost:3000/payment-result",
-    });
-   
+    const updatedOrder = await orderModel.findByIdAndUpdate(
+      orderId,
+      { payment: paymentStatus },
+      { new: true }
+    );
 
-    res.send({ success: true, paymentIntent });
+    if (!updatedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json(updatedOrder);
   } catch (error) {
-    res.send({ error: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Error updating payment status", error });
   }
 };

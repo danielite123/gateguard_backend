@@ -6,6 +6,7 @@ import {
   getRoutes,
   updateRoute,
   deleteRoute,
+  calculateRoute,
 } from "../controllers/routesController.js";
 
 const router = express.Router();
@@ -21,5 +22,7 @@ router.put("/:id", updateRoute);
 
 // Delete a route
 router.delete("/:id", deleteRoute);
+
+router.post("/calculate-route", calculateRoute);
 
 export default router;
