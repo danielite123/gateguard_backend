@@ -25,7 +25,7 @@ export const createOrder = async (req, res) => {
     const savedOrder = await newOrder.save();
 
     // Create a Stripe Checkout session
-    const session = await stripeClient.checkout.sessions.create({
+    const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
         {
